@@ -11,6 +11,8 @@ using Java.Lang;
 using OhMama.Droid.Model;
 using Android.Content;
 using Com.Spotify.Sdk.Android.Authentication;
+using Xamarin.Forms;
+using OhMama.Droid.Services;
 
 namespace OhMama.Droid
 {
@@ -30,6 +32,7 @@ namespace OhMama.Droid
             base.OnCreate(savedInstanceState);
 
             CurrentActivity = this;
+            DependencyService.Register<SpotifyService>();
             global::Xamarin.Forms.Forms.SetFlags("Shell_Experimental", "Visual_Experimental", "CollectionView_Experimental", "FastRenderers_Experimental");
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);

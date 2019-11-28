@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OhMama.Services;
+using System;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -10,7 +11,7 @@ namespace OhMama
         public App()
         {
             InitializeComponent();
-            
+            DependencyService.Register<ToyService>();
             MainPage = new AppShell();
         }
 
