@@ -22,8 +22,7 @@ namespace OhMama.Views
         {
             base.CreateBindings(d);
 
-            d(this.Bind(ViewModel, vm => vm.SearchQuery, v => v.EntrySearchQuerySong.Text));
-            d(this.BindCommand(ViewModel, vm => vm.FindCommand, v => v.ButtonFind));
+            d(this.Bind(ViewModel, vm => vm.SearchQuery, v => v.EntrySearchQuerySong.Text));            
             d(this.BindCommand(ViewModel, vm => vm.VibrateCommand, v => v.ButtonVibrate));
             d(this.BindCommand(ViewModel, vm => vm.StopCommand, v => v.ButtonStop));
 

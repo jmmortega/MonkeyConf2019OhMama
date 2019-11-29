@@ -14,6 +14,7 @@ using Android.Widget;
 using Com.Spotify.Android.Appremote.Api;
 using Com.Spotify.Sdk.Android.Authentication;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using OhMama.Droid.Model;
 using OhMama.Services;
 
@@ -26,28 +27,34 @@ namespace OhMama.Droid.Services
 
         public async Task PlaySong(string searchQuery)
         {
-            _spotifyAuthenticationObservable = Observable.FromEvent<SpotifyAuthenticatedHandler, SpotifyAuthenticationArgs>(
+            _spotifyAuthenticationObservable = Observable.FromEventPattern<EventHandler<SpotifyAuthenticationArgs>, SpotifyAuthenticationArgs>(
                 h => MainActivity.CurrentActivity.OnSpotifyAuthenticated += h,
-                h => MainActivity.CurrentActivity.OnSpotifyAuthenticated -= h)
-                    .Where(x => !string.IsNullOrEmpty(x.AccessToken))
+                h => MainActivity.CurrentActivity.OnSpotifyAuthenticated -= h)                    
+                    .Where(x => !string.IsNullOrEmpty(x.EventArgs.AccessToken))
+                    .Select(x => x.EventArgs.AccessToken)
                     .Subscribe(x =>
                     {
-                        SubscribeSpotifyAppRemote(searchQuery, x.AccessToken);
+                        SubscribeSpotifyAppRemote(searchQuery, x);
                     });
+
+            Authenticate();
         }
 
         private void SubscribeSpotifyAppRemote(string searchQuery, string accessToken)
         {
-            _spotifyConnectObservable = Observable.FromEvent<SpotifyConnectedHandler, SpotifyConnectedArgs>(
+            _spotifyConnectObservable = Observable.FromEventPattern<EventHandler<SpotifyConnectedArgs>, SpotifyConnectedArgs>(
                             h => MainActivity.CurrentActivity.OnSpotifyConnected += h,
                             h => MainActivity.CurrentActivity.OnSpotifyConnected -= h)
-                                .Where(x => x.AppRemote != null)
+                                .Where(x => x.EventArgs.AppRemote != null)
+                                .Select(x => x.EventArgs.AppRemote)
                                 .Subscribe(async x =>
-                                {
+                                {                                    
                                     _spotifyAuthenticationObservable.Dispose();                                                                
                                     var songs = await Search(searchQuery, accessToken);
-                                    x.AppRemote.PlayerApi.Play(songs.First().Uri);
+                                    x.PlayerApi.Play(songs.OrderBy(y => y.Popularity).First().Uri);
                                 });
+
+            Connect();
         }
 
         private void Connect()
@@ -79,7 +86,7 @@ namespace OhMama.Droid.Services
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
             //TODO: Encode query
             var response = await client.GetStringAsync($"https://api.spotify.com/v1/search?q={songQuery}&type=track&market=ES");
-            return JsonConvert.DeserializeObject<List<Track>>(response);
+            return JObject.Parse(response).SelectToken("tracks").SelectToken("items").ToObject<List<Track>>();                        
         }
     }
 }

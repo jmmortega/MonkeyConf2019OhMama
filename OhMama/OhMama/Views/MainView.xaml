@@ -21,7 +21,6 @@
             </StackLayout>
 
             <StackLayout Grid.Row="1" VerticalOptions="CenterAndExpand">
-                <Button x:Name="ButtonFind" Text="Find"/>
                 <Button x:Name="ButtonVibrate" Text="Vibrate"/>
                 <Button x:Name="ButtonStop" Text="Stop"/>
             </StackLayout>

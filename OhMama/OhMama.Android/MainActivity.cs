@@ -19,8 +19,8 @@ namespace OhMama.Droid
     [Activity(Label = "OhMama", Icon = "@mipmap/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity, IConnectorConnectionListener
     {
-        public event SpotifyAuthenticatedHandler OnSpotifyAuthenticated;
-        public event SpotifyConnectedHandler OnSpotifyConnected;
+        public event EventHandler<SpotifyAuthenticationArgs> OnSpotifyAuthenticated;
+        public event EventHandler<SpotifyConnectedArgs> OnSpotifyConnected;
 
         public static MainActivity CurrentActivity { get; private set; }
         

@@ -16,6 +16,7 @@
     <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
     <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
     <AndroidUseLatestPlatformSdk>false</AndroidUseLatestPlatformSdk>
+    <AndroidEnableDesugar>true</AndroidEnableDesugar>
     <TargetFrameworkVersion>v9.0</TargetFrameworkVersion>
     <AndroidEnableSGenConcurrent>true</AndroidEnableSGenConcurrent>
     <AndroidUseAapt2>true</AndroidUseAapt2>
@@ -82,8 +83,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\SpotifyService.cs" />
     <Compile Include="Settings.cs" />
-    <Compile Include="SpotifyAuthenticatedHandler.cs" />
-    <Compile Include="SpotifyConnectedHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Buttplug.Client;
+using Buttplug.Core.Logging;
+using Buttplug.Server;
+using Buttplug.Server.Managers.XamarinBluetoothManager;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,24 +11,29 @@ namespace OhMama.Services
 {
     public class ToyService : IToyService
     {
-        public Task Connect()
-        {
-            throw new NotImplementedException();
-        }
+        private ButtplugEmbeddedConnector _embeddedConnector;
+        private ButtplugClient _client;
 
-        public Task Find()
-        {
-            throw new NotImplementedException();
-        }
+        public ButtplugClient Client => _client;
 
-        public Task Stop()
+        public async Task Init()
         {
-            throw new NotImplementedException();
-        }
+            _embeddedConnector = new ButtplugEmbeddedConnector("Oh mama Server");
+            _embeddedConnector.Server.AddDeviceSubtypeManager<DeviceSubtypeManager>
+                (alogger => new XamarinBluetoothManager(new ButtplugLogManager()));
 
-        public Task Vibrate()
-        {
-            throw new NotImplementedException();
+            _client = new ButtplugClient("Oh mama client", _embeddedConnector);
+            await _client.ConnectAsync();
         }
+        
+        public async Task Find()
+            => await _client?.StartScanningAsync();
+
+
+        public Task Vibrate(ButtplugClientDevice device)
+            => device.SendVibrateCmd(0.5);
+
+        public Task Stop(ButtplugClientDevice device)
+            => device.SendVibrateCmd(0.0);
     }
 }

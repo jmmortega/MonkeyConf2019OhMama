@@ -16,5 +16,8 @@ namespace OhMama.Base
         public virtual void CreateBindings(Action<IDisposable> registerDisposable)
         {
         }
+
+        protected override void OnAppearing() => ViewModel.OnAppearing();
+        
     }
 }
