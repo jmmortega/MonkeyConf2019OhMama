@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Buttplug.Client;
 using System.Reactive.Linq;
 using System.Collections.ObjectModel;
+using OhMama.Models;
 
 namespace OhMama.ViewModels
 {
@@ -28,9 +29,9 @@ namespace OhMama.ViewModels
         private void InitCommands()
         {
             _findCommand = ReactiveCommand.CreateFromTask(PerformFind);
-            _connectCommand = ReactiveCommand.Create<ButtplugClientDevice>(PerformConnect);
+            _connectCommand = ReactiveCommand.Create<ToyDevice>(PerformConnect);
             _vibrateCommand = ReactiveCommand.CreateFromTask(PerformVibrate, CanOperate);            
-            _stopCommand = ReactiveCommand.CreateFromTask(PerformStop, CanOperate);            
+            _stopCommand = ReactiveCommand.CreateFromTask(PerformStop, CanOperate);                             
         }
         
         public async override void OnAppearing()
@@ -48,27 +49,22 @@ namespace OhMama.ViewModels
                 h => _toyService.Client.DeviceAdded -= h)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Where(x => x.EventArgs.Device != null)
-                .Select(x => x.EventArgs.Device)
-                .Subscribe(x =>
-                {
-                    ButtPlugDevices.Add(x);
-                    DeviceSelected = x;                    
-                });
+                .Select(x => new ToyDevice(x.EventArgs.Device))
+                .Where(x => !ToyDevices.Any(y => y.Name == x.Name))
+                .Subscribe(x => ToyDevices.Add(x));
                 
-
             Observable.FromEventPattern<EventHandler<DeviceRemovedEventArgs>, DeviceRemovedEventArgs>(
                 h => _toyService.Client.DeviceRemoved += h,
                 h => _toyService.Client.DeviceRemoved -= h)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Where(x => x.EventArgs.Device != null)
                 .Select(x => x.EventArgs.Device)
-                //.Subscribe(x => ButtPlugDevices.Remove(ButtPlugDevices.FirstOrDefault(y => y.Name == x.Name)));
-                .Subscribe(x => DeviceSelected = null);
+                .Subscribe(x => ToyDevices.Remove(ToyDevices.FirstOrDefault(y => y.Name == x.Name)));                
         }
 
-        private ButtplugClientDevice _deviceSelected;
+        private ToyDevice _deviceSelected;
 
-        private ButtplugClientDevice DeviceSelected
+        public ToyDevice DeviceSelected
         {
             get => _deviceSelected;
             set => this.RaiseAndSetIfChanged(ref _deviceSelected, value);
@@ -82,40 +78,51 @@ namespace OhMama.ViewModels
             set => this.RaiseAndSetIfChanged(ref _searchQuery, value);
         }
 
-        private ObservableCollection<ButtplugClientDevice> _buttPlugDevices = new ObservableCollection<ButtplugClientDevice>();
-        public ObservableCollection<ButtplugClientDevice> ButtPlugDevices
+        private ObservableCollection<ToyDevice> _toyDevices = new ObservableCollection<ToyDevice>();
+        public ObservableCollection<ToyDevice> ToyDevices
         {
-            get => _buttPlugDevices;
-            set => this.RaiseAndSetIfChanged(ref _buttPlugDevices, value);
+            get => _toyDevices;
+            set => this.RaiseAndSetIfChanged(ref _toyDevices, value);
         }
 
         private ReactiveCommand<Unit,Unit> _findCommand;
-        private ReactiveCommand<ButtplugClientDevice, Unit> _connectCommand;
+        private ReactiveCommand<ToyDevice, Unit> _connectCommand;
         private ReactiveCommand<Unit,Unit> _vibrateCommand;
         private ReactiveCommand<Unit,Unit> _stopCommand;
 
         public ReactiveCommand<Unit, Unit> FindCommand => _findCommand;
-        public ReactiveCommand<ButtplugClientDevice, Unit> ConnectCommand => _connectCommand;
+        public ReactiveCommand<ToyDevice, Unit> ConnectCommand => _connectCommand;
         public ReactiveCommand<Unit, Unit> VibrateCommand => _vibrateCommand;
         public ReactiveCommand<Unit, Unit> StopCommand => _stopCommand;
 
-        public IObservable<bool> CanOperate => this.WhenAnyValue(x => x.DeviceSelected, x => x.ButtPlugDevices.Count,
+        public IObservable<bool> CanOperate => this.WhenAnyValue(x => x.DeviceSelected, x => x.ToyDevices.Count,
                                                                     (device, count) => device != null && count > 0);
         private Task PerformFind()
             => _toyService.Find();
 
-        private void PerformConnect(ButtplugClientDevice arg)
+        private void PerformConnect(ToyDevice arg)
             => DeviceSelected = arg;
 
         private async Task PerformVibrate()
         {
-            await _toyService.Vibrate(DeviceSelected);
-            await _spotifyService.PlaySong("can't get enough of your love");
+            string song = "Never, Never Gonna Give ya up barry white";
+            if(!string.IsNullOrEmpty(SearchQuery))
+            {
+                song = SearchQuery;
+            }
+            await _spotifyService.PlaySong(song);
+            await Task.Delay(1000);
+            await _toyService.Vibrate(DeviceSelected);            
         }
             
 
         private Task PerformStop()
-            => _toyService.Stop(DeviceSelected);        
+        {
+            _spotifyService.StopSong();
+            _toyService.Stop(DeviceSelected);
+            return Task.CompletedTask;
+        }
+            
     }
 }
 

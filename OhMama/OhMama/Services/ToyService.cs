@@ -2,6 +2,7 @@
 using Buttplug.Core.Logging;
 using Buttplug.Server;
 using Buttplug.Server.Managers.XamarinBluetoothManager;
+using OhMama.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -30,10 +31,10 @@ namespace OhMama.Services
             => await _client?.StartScanningAsync();
 
 
-        public Task Vibrate(ButtplugClientDevice device)
-            => device.SendVibrateCmd(0.5);
+        public Task Vibrate(ToyDevice device)
+            => device.SendVibration(0.5);
 
-        public Task Stop(ButtplugClientDevice device)
-            => device.SendVibrateCmd(0.0);
+        public Task Stop(ToyDevice device)
+            => device.SendVibration(0.0);
     }
 }

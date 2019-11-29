@@ -1,4 +1,5 @@
 ﻿using Buttplug.Client;
+using OhMama.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,8 +14,8 @@ namespace OhMama.Services
 
         Task Find();
         
-        Task Vibrate(ButtplugClientDevice device);
+        Task Vibrate(ToyDevice device);
 
-        Task Stop(ButtplugClientDevice device);
+        Task Stop(ToyDevice device);
     }
 }

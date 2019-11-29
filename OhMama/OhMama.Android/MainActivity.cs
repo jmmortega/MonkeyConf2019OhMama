@@ -13,6 +13,7 @@ using Android.Content;
 using Com.Spotify.Sdk.Android.Authentication;
 using Xamarin.Forms;
 using OhMama.Droid.Services;
+using Android;
 
 namespace OhMama.Droid
 {
@@ -31,6 +32,7 @@ namespace OhMama.Droid
 
             base.OnCreate(savedInstanceState);
 
+            RequestPermission();
             CurrentActivity = this;
             DependencyService.Register<SpotifyService>();
             global::Xamarin.Forms.Forms.SetFlags("Shell_Experimental", "Visual_Experimental", "CollectionView_Experimental", "FastRenderers_Experimental");
@@ -38,8 +40,22 @@ namespace OhMama.Droid
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
             LoadApplication(new App());
         }
-        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
+
+        private void RequestPermission()
         {
+            RequestPermissions(new string[]
+            {
+                Manifest.Permission.AccessCoarseLocation,
+                Manifest.Permission.AccessFineLocation,
+                Manifest.Permission.Internet,
+                Manifest.Permission.ReadExternalStorage,
+                Manifest.Permission.WriteExternalStorage,
+                Manifest.Permission.Bluetooth
+            },0);
+        }
+
+        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
+        {            
             Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
 
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);

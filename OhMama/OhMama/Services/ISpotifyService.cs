@@ -8,5 +8,7 @@ namespace OhMama.Services
     public interface ISpotifyService
     {
         Task PlaySong(string searchQuery);
+
+        Task StopSong();
     }
 }

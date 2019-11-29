@@ -24,6 +24,7 @@ namespace OhMama.Droid.Services
     {                
         private IDisposable _spotifyConnectObservable;
         private IDisposable _spotifyAuthenticationObservable;
+        private SpotifyAppRemote _appRemote;
 
         public async Task PlaySong(string searchQuery)
         {
@@ -40,6 +41,12 @@ namespace OhMama.Droid.Services
             Authenticate();
         }
 
+        public Task StopSong()
+        {
+            _appRemote?.PlayerApi.Pause();
+            return Task.CompletedTask;
+        }
+
         private void SubscribeSpotifyAppRemote(string searchQuery, string accessToken)
         {
             _spotifyConnectObservable = Observable.FromEventPattern<EventHandler<SpotifyConnectedArgs>, SpotifyConnectedArgs>(
@@ -51,6 +58,7 @@ namespace OhMama.Droid.Services
                                 {                                    
                                     _spotifyAuthenticationObservable.Dispose();                                                                
                                     var songs = await Search(searchQuery, accessToken);
+                                    _appRemote = x;
                                     x.PlayerApi.Play(songs.OrderBy(y => y.Popularity).First().Uri);
                                 });
 
@@ -87,6 +95,6 @@ namespace OhMama.Droid.Services
             //TODO: Encode query
             var response = await client.GetStringAsync($"https://api.spotify.com/v1/search?q={songQuery}&type=track&market=ES");
             return JObject.Parse(response).SelectToken("tracks").SelectToken("items").ToObject<List<Track>>();                        
-        }
+        }        
     }
 }

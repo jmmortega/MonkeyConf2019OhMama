@@ -12,17 +12,48 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="3*"/>
-                <RowDefinition Height="7*"/>
+                <RowDefinition Height="4*"/>
+                <RowDefinition Height="3*"/>
             </Grid.RowDefinitions>
             
-            <StackLayout Grid.Row="0">
+            <StackLayout Grid.Row="0" Margin="16">
                 <Label Text="Search song" HorizontalTextAlignment="Center"/>
                 <Entry x:Name="EntrySearchQuerySong"/>
             </StackLayout>
 
-            <StackLayout Grid.Row="1" VerticalOptions="CenterAndExpand">
-                <Button x:Name="ButtonVibrate" Text="Vibrate"/>
-                <Button x:Name="ButtonStop" Text="Stop"/>
+            <ListView Grid.Row="1" x:Name="ListDevices">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <Grid>
+                                <Label Text="{Binding Name}" VerticalTextAlignment="Center" VerticalOptions="Center" FontSize="30"
+                                       TranslationX="25"/>
+                            </Grid>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+            <StackLayout Grid.Row="2" VerticalOptions="Center" HorizontalOptions="Center" Orientation="Horizontal">
+                <Frame x:Name="FrameVibration"
+                       CornerRadius="50"  WidthRequest="50" HeightRequest="50" BackgroundColor="Green" VerticalOptions="Center"
+                       TranslationY="200">
+                    <Label Text="Vibrate" TextColor="White" HorizontalTextAlignment="Center" VerticalOptions="Center"/>
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer x:Name="ButtonVibrate"/>
+                    </Frame.GestureRecognizers>
+                </Frame>
+
+                <Frame x:Name="FrameStop"
+                       CornerRadius="50" WidthRequest="50" HeightRequest="50" BackgroundColor="Red" VerticalOptions="Center"
+                       TranslationY="200">
+                    <Label Text="Stop" TextColor="White" HorizontalTextAlignment="Center" VerticalOptions="Center"/>
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer x:Name="ButtonStop"/>
+                    </Frame.GestureRecognizers>
+                </Frame>
+                    
+                    
             </StackLayout>
         </Grid>
     </ContentPage.Content>
